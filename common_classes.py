@@ -19,8 +19,17 @@ class Scene:
 
 
 class GameObject:
-    def __init__(self, position: pygame.Vector2 = None):
+    def __init__(self, position: pygame.Vector2 | tuple = None):
+        if isinstance(position, tuple):
+            position = pygame.Vector2(position)
         self.position = position or pygame.Vector2(0, 0)
 
     def render(self, screen: pygame.Surface):
-        draw.rect(screen, (255, 255, 255), (self.position.x, self.position.y, 10, 10))
+        draw.rect(screen, (255, 255, 255), (self.position.x - 5, self.position.y - 5, 10, 10))
+
+
+class PhysicsMixin:
+    velocity: pygame.Vector2 | tuple[int, int]
+
+    def update(self, dt, time):
+        ...

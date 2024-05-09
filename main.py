@@ -1,7 +1,10 @@
+from random import random, randint
+
 import pygame
 import logging
 
-from scene import Scene, GameObject
+from boid import Boid, Flock
+from common_classes import Scene, GameObject, PhysicsMixin
 
 logger = logging.getLogger("game")
 
@@ -32,19 +35,28 @@ class Game:
 
     def run(self):
         self.clock = pygame.time.Clock()
-
+        delta_time = 0
+        start_time = pygame.time.get_ticks()
+        last_time = start_time
         while self.running:
+
             nr_events = self.handle_events()
             logger.debug(f"Handled {nr_events} events")
-            self.update_simulation()
+            self.update_simulation(delta_time, pygame.time.get_ticks() - start_time)
             self.render()
 
             pygame.display.flip()
             self.clock.tick(60)
+            delta_time = (pygame.time.get_ticks() - last_time) / 1000
+            last_time = pygame.time.get_ticks()
 
         pygame.quit()
 
-    def update_simulation(self):
+    def update_simulation(self, dt, time):
+        for obj in self.current_scene.objects:
+            if not isinstance(obj, PhysicsMixin):
+                continue
+            obj.update(dt, time)
         pass
 
     def render(self):
@@ -71,6 +83,11 @@ if __name__ == '__main__':
     game = Game()
     scene = Scene("Game Scene")
     width, height = pygame.display.get_surface().get_size()
-    scene.add_object(GameObject(pygame.Vector2(width // 2, height // 2)))
+    flock = Flock()
+    for i in range(4):
+        b = Boid((width // 2 + i*10, height // 2 + (i*15) % 25), 10*pygame.Vector2(0, -15), 1, angle=180)
+        b.id = i + 1
+        scene.add_object(b)
+        flock.add_boid(b)
     game.load_scene(scene)
     game.run()
