@@ -1,13 +1,10 @@
-from random import random, randint
-
-import pygame
 import logging
 
-from boid import Boid, Flock
+import pygame
+
+from boid2 import Boid, Flock
 from common_classes import Scene, GameObject, PhysicsMixin
-
-logger = logging.getLogger("game")
-
+from config import SIZE, logger
 
 class Game:
     running = True
@@ -15,10 +12,10 @@ class Game:
     clock = None
     current_scene = None
 
-    def __init__(self):
+    def __init__(self, size: tuple[int, int] = (1920, 1080)):
         pygame.init()
         self.current_scene = Scene("Main Menu")
-        self.screen = pygame.display.set_mode((1920, 1080))
+        self.screen = pygame.display.set_mode(size)
         pygame.display.set_caption("Game")
 
     def handle_events(self):
@@ -41,7 +38,7 @@ class Game:
         while self.running:
 
             nr_events = self.handle_events()
-            logger.debug(f"Handled {nr_events} events")
+            #logger.debug(f"Handled {nr_events} events")
             self.update_simulation(delta_time, pygame.time.get_ticks() - start_time)
             self.render()
 
@@ -79,13 +76,15 @@ class Game:
 
 
 if __name__ == '__main__':
-    logger.setLevel(logging.DEBUG)
-    game = Game()
+    logger.addHandler(logging.FileHandler("log.txt", "w"))
+    logger.debug("Starting game")
+    game = Game(SIZE)
     scene = Scene("Game Scene")
     width, height = pygame.display.get_surface().get_size()
     flock = Flock()
     for i in range(4):
-        b = Boid((width // 2 + i*10, height // 2 + (i*15) % 25), 10*pygame.Vector2(0, -15), 1, angle=180)
+        #b = Boid((width // 2 + i*10, height // 2 + (i*15) % 25), 10*pygame.Vector2(0, -15), 10*pygame.Vector2(0, -5))
+        b = Boid((width // 2 + i * 10, height // 2 + (i * 15) % 25), 50, pygame.Vector2(0, -1).rotate(i * 65))
         b.id = i + 1
         scene.add_object(b)
         flock.add_boid(b)

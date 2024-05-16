@@ -19,6 +19,8 @@ class Scene:
 
 
 class GameObject:
+    id: int
+
     def __init__(self, position: pygame.Vector2 | tuple = None):
         if isinstance(position, tuple):
             position = pygame.Vector2(position)
