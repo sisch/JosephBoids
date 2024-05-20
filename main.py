@@ -5,6 +5,8 @@ import pygame
 from boid2 import Boid, Flock
 from common_classes import Scene, GameObject, PhysicsMixin
 from config import SIZE, logger
+from joseph_boid import JosephBoid
+
 
 class Game:
     running = True
@@ -57,7 +59,7 @@ class Game:
         pass
 
     def render(self):
-        self.screen.fill((0, 0, 0))
+        self.screen.fill((225, 225, 225))
         self.current_scene.render(self.screen)
 
     def handle_input(self, event) -> callable:
@@ -82,11 +84,16 @@ if __name__ == '__main__':
     scene = Scene("Game Scene")
     width, height = pygame.display.get_surface().get_size()
     flock = Flock()
-    for i in range(4):
+    flock.target = pygame.Vector2(width // 2, height // 2)
+    for i in range(20):
         #b = Boid((width // 2 + i*10, height // 2 + (i*15) % 25), 10*pygame.Vector2(0, -15), 10*pygame.Vector2(0, -5))
-        b = Boid((width // 2 + i * 10, height // 2 + (i * 15) % 25), 50, pygame.Vector2(0, -1).rotate(i * 65))
+        b = JosephBoid((width // 2 + i * 10, height // 2 + (i * 15) % 25), 250, pygame.Vector2(0, -1).rotate(i * 65))
         b.id = i + 1
         scene.add_object(b)
         flock.add_boid(b)
+    j = JosephBoid((width // 2, height // 2), 250, pygame.Vector2(0, -1))
+    j.id = 99
+    flock.add_boid(j)
+    scene.add_object(j)
     game.load_scene(scene)
     game.run()
